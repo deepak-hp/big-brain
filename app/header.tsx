@@ -1,9 +1,6 @@
-"use client";
-
 import { ModeToggle } from "@/components/ui/mode-toggle";
-import { SignInButton, UserButton } from "@clerk/nextjs";
-import { Authenticated, Unauthenticated } from "convex/react";
 import Image from "next/image";
+import { HeaderActions } from "./header-actions";
 
 export function Header() {
   return (
@@ -19,16 +16,9 @@ export function Header() {
           />
           BigBrain
         </div>
-        <div>
-          <Unauthenticated>
-            <SignInButton />
-          </Unauthenticated>
-          <Authenticated>
-            <div className="flex gap-8">
-              <ModeToggle />
-              <UserButton />
-            </div>
-          </Authenticated>
+        <div className="flex gap-8 items-center">
+          <ModeToggle />
+          <HeaderActions />
         </div>
       </div>
     </div>
