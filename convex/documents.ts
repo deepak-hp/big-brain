@@ -1,5 +1,53 @@
-import { mutation, query } from "./_generated/server";
+import {
+  MutationCtx,
+  QueryCtx,
+  action,
+  internalQuery,
+  mutation,
+  query,
+} from "./_generated/server";
 import { ConvexError, v } from "convex/values";
+import { api, internal } from "./_generated/api";
+
+import OpenAI from "openai";
+import { Id } from "./_generated/dataModel";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export async function hasAccessToDocuments(
+  ctx: MutationCtx | QueryCtx,
+  documentId: Id<"documents">
+) {
+  const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+  if (!userId) {
+    return null;
+  }
+
+  const document = await ctx.db.get(documentId);
+
+  if (!document) {
+    return null;
+  }
+
+  if (!document || document?.tokenIdentifier !== userId) {
+    return null;
+  }
+
+  return { document, userId };
+}
+
+export const hasAccessToDocumentsQuery = internalQuery({
+  args: {
+    documentId: v.id("documents"),
+  },
+  async handler(ctx, args) {
+    {
+      return await hasAccessToDocuments(ctx, args.documentId);
+    }
+  },
+});
 
 export const generateUploadUrl = mutation(async (ctx) => {
   return await ctx.storage.generateUploadUrl();
@@ -23,27 +71,34 @@ export const getDocument = query({
     documentId: v.id("documents"),
   },
   async handler(ctx, args) {
-    const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
-    if (!userId) {
-      return null;
-    }
+    // const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+    // if (!userId) {
+    //   return null;
+    // }
 
-    const document = await ctx.db.get(args.documentId);
+    // const document = await ctx.db.get(args.documentId);
 
-    if (!document) {
-      return null;
-    }
+    // if (!document) {
+    //   return null;
+    // }
 
-    if (!document || document?.tokenIdentifier !== userId) {
+    // if (!document || document?.tokenIdentifier !== userId) {
+    //   return null;
+    // }
+
+    const accessObj = await hasAccessToDocuments(ctx, args.documentId);
+
+    if (!accessObj) {
       return null;
     }
 
     return {
-      ...document,
-      documentUrl: await ctx.storage.getUrl(document.fileId),
+      ...accessObj.document,
+      documentUrl: await ctx.storage.getUrl(accessObj.document.fileId),
     };
   },
 });
+
 export const createDocument = mutation({
   args: {
     title: v.string(),
@@ -60,5 +115,67 @@ export const createDocument = mutation({
       tokenIdentifier: userId,
       fileId: args.fileId,
     });
+  },
+});
+
+export const askQuestion = action({
+  args: {
+    question: v.string(),
+    documentId: v.id("documents"),
+  },
+  async handler(ctx, args) {
+    const accessObj = await ctx.runQuery(
+      internal.documents.hasAccessToDocumentsQuery,
+      {
+        documentId: args.documentId,
+      }
+    );
+
+    if (!accessObj) {
+      throw new ConvexError("you do not have access to this document");
+    }
+
+    const file = await ctx.storage.get(accessObj.document.fileId);
+
+    if (!file) {
+      throw new ConvexError("File not found");
+    }
+
+    const text = await file.text();
+
+    const chatCompletion: OpenAI.Chat.Completions.ChatCompletion =
+      await openai.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `Here is a text file: ${text}`,
+          },
+          {
+            role: "user",
+            content: `Please answer this question: ${args.question}`,
+          },
+        ],
+        model: "gpt-3.5-turbo",
+      });
+
+    await ctx.runMutation(internal.chats.createChatRecord, {
+      documentId: args.documentId,
+      text: args.question,
+      isHuman: true,
+      tokenIdentifier: accessObj.userId,
+    });
+
+    const response =
+      chatCompletion.choices[0].message.content ??
+      "could not generate a response";
+
+    await ctx.runMutation(internal.chats.createChatRecord, {
+      documentId: args.documentId,
+      text: response,
+      isHuman: false,
+      tokenIdentifier: accessObj.userId,
+    });
+
+    return response;
   },
 });

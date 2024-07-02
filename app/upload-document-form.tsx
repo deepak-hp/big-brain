@@ -36,7 +36,6 @@ export default function UploadDocumentForm({
       title: "",
     },
   });
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const url = await generateUploadUrl();
 
@@ -92,7 +91,7 @@ export default function UploadDocumentForm({
           )}
         />
         <LoadingButton
-          isLoading={form.formState.isSubmitted}
+          isLoading={form.formState.isSubmitting}
           loadingText="Uploading..."
         >
           Upload
