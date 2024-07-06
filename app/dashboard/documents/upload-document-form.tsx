@@ -63,7 +63,7 @@ export default function UploadDocumentForm({
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Expense Report" {...field} />
+                <Input placeholder="Enter title" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

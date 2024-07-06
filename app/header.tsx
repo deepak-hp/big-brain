@@ -19,7 +19,7 @@ export function Header() {
             BigBrain
           </Link>
           <nav>
-            <Link className="hover:text-slate-300" href="/">
+            <Link className="hover:text-slate-300" href="/dashboard">
               Documents
             </Link>
           </nav>
