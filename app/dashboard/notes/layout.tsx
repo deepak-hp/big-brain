@@ -8,18 +8,33 @@ import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
 import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function NotesLayout({ children }: { children: ReactNode }) {
   const notes = useQuery(api.notes.getNotes);
   const { noteId } = useParams<{ noteId: Id<"notes"> }>();
-  const hasNotes = notes && notes?.length;
   return (
     <main className="space-y-8 w-full">
       <div className="flex justify-between items-center">
         <h1 className="text-4xl font-bold">Notes</h1>
         <CreateNoteButton />
       </div>
-      {!hasNotes ? (
+      {!notes ? (
+        <div className="flex gap-4">
+          <div className="w-[180px] space-y-4">
+            <Skeleton className="h-[20px] w-full" />
+            <Skeleton className="h-[20px] w-full" />
+            <Skeleton className="h-[20px] w-full" />
+            <Skeleton className="h-[20px] w-full" />
+            <Skeleton className="h-[20px] w-full" />
+            <Skeleton className="h-[20px] w-full" />
+          </div>
+          <div className="flex-1">
+            <Skeleton className="h-[400px] w-full" />
+          </div>
+        </div>
+      ) : null}
+      {notes?.length === 0 ? (
         <div className=" p-12 h-auto flex justify-center flex-col items-center gap-8">
           <Image
             src="/documents.svg"
@@ -31,7 +46,7 @@ export default function NotesLayout({ children }: { children: ReactNode }) {
           <CreateNoteButton />
         </div>
       ) : null}
-      {hasNotes ? (
+      {notes?.length ? (
         <div className="flex gap-12">
           <ul className="space-y-2 w[200px]">
             {notes?.map((note) => (
