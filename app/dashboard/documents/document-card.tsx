@@ -34,7 +34,7 @@ export function DocumentCard({ document }: { document: Doc<"documents"> }) {
           variant={"secondary"}
           className="flex items-center gap-2"
         >
-          <Link href={`/documents/${document._id}`}>
+          <Link href={`/dashboard/documents/${document._id}`}>
             <EyeIcon className="w-4 h-4" />
             View
           </Link>
