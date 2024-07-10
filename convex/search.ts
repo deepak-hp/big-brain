@@ -1,12 +1,14 @@
 import { v } from "convex/values";
 import { action, query } from "./_generated/server";
 import { embed } from "./notes";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
+import { hasOrgAccess } from "./documents";
 
 export const searchAction = action({
   args: {
     search: v.string(),
+    orgId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
@@ -14,11 +16,27 @@ export const searchAction = action({
       return null;
     }
 
+    if (args.orgId) {
+      const hasAccess = await ctx.runQuery(
+        internal.memberships.hasOrgAccessQuery,
+        {
+          orgId: args.orgId,
+        }
+      );
+      if (!hasAccess) {
+        return null;
+      }
+    }
+
+    const filter = args.orgId
+      ? (q: any) => q.eq("orgId", args.orgId)
+      : (q: any) => q.eq("tokenIdentifier", userId);
+
     const embedding = await embed(args.search);
     const noteResults = await ctx.vectorSearch("notes", "by_embedding", {
       vector: embedding,
       limit: 5,
-      filter: (q) => q.eq("tokenIdentifier", userId),
+      filter,
     });
 
     const documentResults = await ctx.vectorSearch(
@@ -27,7 +45,7 @@ export const searchAction = action({
       {
         vector: embedding,
         limit: 5,
-        filter: (q) => q.eq("tokenIdentifier", userId),
+        filter,
       }
     );
 

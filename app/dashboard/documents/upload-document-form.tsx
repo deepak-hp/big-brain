@@ -17,6 +17,7 @@ import { api } from "@/convex/_generated/api";
 import { LoadingButton } from "@/components/ui/loading-button";
 import { generateUploadUrl } from "@/convex/documents";
 import { Id } from "@/convex/_generated/dataModel";
+import { useOrganization } from "@clerk/nextjs";
 
 const formSchema = z.object({
   title: z.string().min(2).max(250),
@@ -28,6 +29,7 @@ export default function UploadDocumentForm({
 }: {
   onUpload: () => void;
 }) {
+  const organization = useOrganization();
   const createDocument = useMutation(api.documents.createDocument);
   const generateUploadUrl = useMutation(api.documents.generateUploadUrl);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,6 +52,7 @@ export default function UploadDocumentForm({
     await createDocument({
       title: values.title,
       fileId: storageId as Id<"_storage">,
+      orgId: organization.organization?.id,
     });
     onUpload();
   }

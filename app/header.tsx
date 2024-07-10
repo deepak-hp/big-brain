@@ -2,6 +2,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import Image from "next/image";
 import { HeaderActions } from "./header-actions";
 import Link from "next/link";
+import { OrganizationSwitcher } from "@clerk/nextjs";
 
 export function Header() {
   return (
@@ -18,9 +19,10 @@ export function Header() {
             />
             BigBrain
           </Link>
-          <nav>
+          <nav className="flex items-center gap-8">
+            <OrganizationSwitcher />
             <Link className="hover:text-slate-300" href="/dashboard">
-              Documents
+              Dashboard
             </Link>
           </nav>
         </div>
