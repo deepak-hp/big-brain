@@ -1,10 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { SignInButton } from "@clerk/nextjs";
+import { SignInButton, useAuth } from "@clerk/nextjs";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function LandingPage() {
+  const { userId } = useAuth();
   return (
     <div className="">
       <div className="relative isolate px-6 pt-14 lg:px-8">
@@ -37,11 +39,19 @@ export default function LandingPage() {
               docs and allowing easy vector search.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <SignInButton>
-                <Button className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                  Get started
-                </Button>
-              </SignInButton>
+              {!userId ? (
+                <SignInButton>
+                  <Button className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    Get started
+                  </Button>
+                </SignInButton>
+              ) : (
+                <Link href="/dashboard">
+                  <Button className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    Get started
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
