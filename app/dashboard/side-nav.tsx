@@ -12,7 +12,7 @@ export default function SideNav() {
         <li>
           <Link
             className={cn(
-              "font-light text-xl hover:text-cyan-100 flex gap-2 items-center",
+              "font-light text-xl hover:text-cyan-400 dark:hover:text-cyan-100 flex gap-2 items-center",
               { "text-cyan-300": pathName.endsWith("/search") }
             )}
             href="/dashboard/search"
@@ -24,7 +24,7 @@ export default function SideNav() {
         <li>
           <Link
             className={cn(
-              "font-light text-xl hover:text-cyan-100 flex gap-2 items-center",
+              "font-light text-xl hover:text-cyan-400 dark:hover:text-cyan-100 flex gap-2 items-center",
               { "text-cyan-300": pathName.endsWith("/documents") }
             )}
             href="/dashboard/documents"
@@ -35,25 +35,13 @@ export default function SideNav() {
         <li>
           <Link
             className={cn(
-              "font-light text-xl hover:text-cyan-100 flex gap-2 items-center",
+              "font-light text-xl hover:text-cyan-400 dark:hover:text-cyan-100 flex gap-2 items-center",
               { "text-cyan-300": pathName.endsWith("/notes") }
             )}
             href="/dashboard/notes"
           >
             <ClipboardPen />
             Notes
-          </Link>
-        </li>
-        <li>
-          <Link
-            className={cn(
-              "font-light text-xl hover:text-cyan-100 flex gap-2 items-center",
-              { "text-cyan-300": pathName.endsWith("/settings") }
-            )}
-            href="/dashboard/settings"
-          >
-            <Cog />
-            Settings
           </Link>
         </li>
       </ul>

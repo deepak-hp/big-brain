@@ -13,9 +13,9 @@ export default function ChatPanel({
   const chats = useQuery(api.chats.getChatsForDocument, { documentId });
   //   const askQuestion = useAction(api.documents.askQuestion);
   return (
-    <div className="bg-gray-900 flex flex-col gap-2 p-6 rounded-xl">
+    <div className="dark:bg-gray-900 bg-slate-100 flex flex-col gap-2 p-6 rounded-xl">
       <div className="h-[50vh] overflow-y-auto flex flex-col gap-2">
-        <div className="bg-slate-950 rounded p-2 w-max">
+        <div className="dark:bg-slate-950 bg-slate-100 rounded p-2 w-max">
           Ask any question using AI about this document below:
         </div>
         {chats?.map((chat) => (
@@ -23,9 +23,9 @@ export default function ChatPanel({
             key={chat._id}
             className={cn(
               {
-                "bg-slate-800 text-right self-end w-max max-w-[70vh]":
+                "dark:bg-slate-800 bg-slate-200 text-right self-end w-max max-w-[70vh]":
                   chat.isHuman,
-                "bg-slate-950": !chat.isHuman,
+                "dark:bg-slate-950 bg-slate-300": !chat.isHuman,
               },
               "rounded p-2 whitespace-pre-line"
             )}

@@ -52,13 +52,16 @@ export default function NotesLayout({ children }: { children: ReactNode }) {
       ) : null}
       {notes?.length ? (
         <div className="flex gap-12">
-          <ul className="space-y-2 w[200px]">
+          <ul className="space-y-2 w-[200px]">
             {notes?.map((note) => (
               <li
                 key={note._id}
-                className={cn("text-base hover:text-cyan-200", {
-                  "text-cyan-300": note._id === noteId,
-                })}
+                className={cn(
+                  "text-base hover:text-cyan-200 dark:hover:text-cyan-100",
+                  {
+                    "text-cyan-300": note._id === noteId,
+                  }
+                )}
               >
                 <Link href={`/dashboard/notes/${note._id}`}>
                   {note.text.length > 24
@@ -68,7 +71,9 @@ export default function NotesLayout({ children }: { children: ReactNode }) {
               </li>
             ))}
           </ul>
-          <div className="bg-slate-800 rounded p-4 w-full">{children}</div>
+          <div className="dark:bg-slate-800 bg-slate-200 rounded p-4 w-full">
+            {children}
+          </div>
         </div>
       ) : null}
     </main>
