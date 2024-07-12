@@ -18,7 +18,7 @@ function SearchResult({
 }) {
   return (
     <Link href={url}>
-      <li className="space-y-4 hover:bg-slate-700 bg-slate-800 rounded p-4 whitespace-pre-line">
+      <li className="space-y-4 dark:hover:bg-slate-700 dark:bg-slate-800 bg-slate-200 hover:bg-slate-300 rounded p-4 whitespace-pre-line">
         <div className="flex items-center justify-between">
           {type === "notes" ? (
             <div className="flex gap-1 text-xl items-center">
